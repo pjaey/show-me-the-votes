@@ -1,7 +1,8 @@
 /* Update the relevant fields with the new data */
 function setStackExchangeInfo(info) {
     //TODO: support multiple patterns and read them from a file
-    var pattern = '/questions/([0-9]*?)/';
+    //TODO: replace pattern with 'http://([^.]*?)\.com/questions/([0-9]*?)/|http://([^.]*?).stackexchange\.com/questions/([0-9]*?)/'
+    var pattern = ('http://stackoverflow\.com/questions/([0-9]*?)/');
     var matches = [];
     for(var i=0; i<info.links.length; i++) {
       var match = info.links[i].match(pattern);

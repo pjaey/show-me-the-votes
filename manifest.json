@@ -9,7 +9,7 @@
     "persistent": false,
     "scripts": ["background.js"]
   },
-
+// TODO: matches should only contain search engine websites
   "content_scripts": [
     {
     "matches": ["http://*/*", "https://*/*"],
