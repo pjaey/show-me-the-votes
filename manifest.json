@@ -12,8 +12,8 @@
 // TODO: matches should only contain search engine websites
   "content_scripts": [
     {
-    "matches": ["http://*/*", "https://*/*"],
     "js": ["content.js"],
+    "matches": ["http://*/*", "https://*/*"],
     "run_at": "document_idle",
     "all_frames": false
     }
@@ -27,6 +27,7 @@
   
   "permissions": [
     "activeTab",
-    "tabs"
+    "tabs",
+    "https://ajax.googleapis.com/"
   ]
 }
