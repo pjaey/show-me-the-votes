@@ -19,8 +19,8 @@ function setStackExchangeInfo(dom) {
     /* TODO: replace pattern with 'http://([^.]*?)\.com/questions/([0-9]*?)/|
      http://([^.]*?).stackexchange\.com/questions/([0-9]*?)/' */
     var pattern = ('^https{0,1}://stackoverflow\.com/questions/([0-9]*?)/'),
-            hashes = [],
-            found = false;
+        hashes = [],
+        found = false;
     for (var i = 0; i < dom.links.length; i++) {
         var match = dom.links[i].match(pattern);
         if (match !== null && match.length >= 2) {
@@ -29,11 +29,11 @@ function setStackExchangeInfo(dom) {
     }
 
     var seen = {},
-            unique_hashes = hashes.filter(function (item) {
-                return seen.hasOwnProperty(item) ? false : (seen[item] = true);
-            }),
-            content = document.getElementById('content-area'),
-            header = document.createElement('h3');
+        unique_hashes = hashes.filter(function (item) {
+            return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+        }),
+        content = document.getElementById('content-area'),
+        header = document.createElement('h3');
     header.setAttribute("style", "text-align: center;");
     content.appendChild(header);
     if (unique_hashes < 1) {
@@ -69,6 +69,7 @@ function setStackExchangeInfo(dom) {
                             row.insertCell(1).innerHTML = items[index].score;
                             row.insertCell(2).innerHTML = items[index].answer_count;
                         }
+                        
                     }
                 });
     }
@@ -83,8 +84,8 @@ window.addEventListener('DOMContentLoaded', function () {
     }, function (tabs) {
         /* ...and send a request to get all the links... */
         chrome.tabs.sendMessage(
-                tabs[0].id,
-                {from: 'popup', subject: 'links'},
-                setStackExchangeInfo);
+            tabs[0].id,
+            {from: 'popup', subject: 'links'},
+            setStackExchangeInfo);
     });
 });
