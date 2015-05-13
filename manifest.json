@@ -1,14 +1,18 @@
 {
   "manifest_version": 2,
 
-  "name": "show-me-the-votes",
+  "name": "Show-Me-The-Votes",
   "description": "This extension displays total number of comments and votes for the links present on the website ",
   "version": "1.0",
 
-// TODO: matches should only contain search engine websites
+  "background": {
+    "persistent": false,
+    "scripts": ["background.js"]
+  },
+
   "content_scripts": [
     {
-    "js": ["content.js"],
+    "js": ["jquery-2.1.4.js", "content.js"],
     "matches": ["http://*/*", "https://*/*"],
     "run_at": "document_idle",
     "all_frames": false
@@ -23,7 +27,6 @@
   
   "permissions": [
     "activeTab",
-    "tabs",
-    "https://ajax.googleapis.com/"
+    "tabs"
   ]
 }

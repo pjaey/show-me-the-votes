@@ -7,85 +7,66 @@ function getTable(headers) {
     if (headers !== null && headers.length > 0) {
         var row = table.insertRow(0);
         for (var row_index = 0; row_index < headers.length; row_index++) {
-            row.insertCell(row_index).innerHTML = headers[row_index];
+            row.insertCell(row_index).innerHTML = '<div align="center"><b>' + 
+            headers[row_index] + 
+            '</b></div>';
         }
     }
     return table;
 }
 
-/* Update the relevant fields with the new data */
-function setStackExchangeInfo(dom) {
-    /* TODO: support multiple patterns and read them from a file */
-    /* TODO: replace pattern with 'http://([^.]*?)\.com/questions/([0-9]*?)/|
-     http://([^.]*?).stackexchange\.com/questions/([0-9]*?)/' */
-    var pattern = ('^https{0,1}://stackoverflow\.com/questions/([0-9]*?)/'),
-        hashes = [],
-        found = false;
-    for (var i = 0; i < dom.links.length; i++) {
-        var match = dom.links[i].match(pattern);
-        if (match !== null && match.length >= 2) {
-            hashes.push(match[1]);
-        }
-    }
+/* 
+Gets an <a> element. Since we want to open a new tab everytime the link is
+clicked, an event listener is attached to each of these tags.    
+*/
+function getATag(href, text) {
+    var aTag = document.createElement('a');
+    aTag.setAttribute('href', href);
+    aTag.innerHTML = text;
+    //open a new tab if clicked on aTag
+    aTag.addEventListener('click', function () {
+        var target = event.target || event.srcElement;
+        chrome.tabs.create({url: this.href});
+    });
+    return aTag;
+}
 
-    var seen = {},
-        unique_hashes = hashes.filter(function (item) {
-            return seen.hasOwnProperty(item) ? false : (seen[item] = true);
-        }),
-        content = document.getElementById('content-area'),
+/* Update the relevant fields with the data */
+function setStackOverflowInfo(json_list) {
+    /* TODO: support multiple patterns and read them from a file */
+    /*  
+    TODO: replace pattern with 'http://([^.]*?)\.com/questions/([0-9]*?)/|
+    http://([^.]*?).stackexchange\.com/questions/([0-9]*?)/' 
+     */
+    var content = document.getElementById('content-area'),
         header = document.createElement('h3');
     header.setAttribute("style", "text-align: center;");
     content.appendChild(header);
-    if (unique_hashes < 1) {
-        header.textContent = 'No stackoverflow links were found on this page';
+    if (json_list.length == 0) {
+        header.textContent = 'No links found'
         return;
     }
     header.textContent = 'StackOverflow Links'
     var table = getTable(['Title', 'Score', 'Answers']);
     content.appendChild(table);
-    var query_param, chunk = 100;
-    for (var i = 0, j = unique_hashes.length; i < j; i += chunk) {
-        query_param = unique_hashes.slice(i, i + chunk).join(';');
-        jQuery.getJSON('https://api.stackexchange.com/2.2/questions/' +
-                query_param +
-                '?order=desc&sort=votes&site=stackoverflow',
-                function (response) {
-                    if (response.hasOwnProperty("items")) {
-                        var items = response['items'];
-                        for (var index = 0; index < items.length; index++) {
-                            var row = table.insertRow(index + 1);
-                            /* make the title clickable */
-                            var cell0 = row.insertCell(0);
-                            var aTag = document.createElement('a');
-                            aTag.setAttribute('href', items[index].link);
-                            aTag.setAttribute('id', 'atag' + index);
-                            aTag.innerHTML = items[index].title;
-                            cell0.appendChild(aTag);
-                            //open a new tab if clicked on aTag
-                            aTag.addEventListener('click', function () {
-                                var target = event.target || event.srcElement;
-                                chrome.tabs.create({url: this.href});
-                            });
-                            row.insertCell(1).innerHTML = items[index].score;
-                            row.insertCell(2).innerHTML = items[index].answer_count;
-                        }
-                        
-                    }
-                });
+    for (var index = 0; index < json_list.length; index++) {
+        var row = table.insertRow(index + 1);
+        /* make the title clickable */
+        row.insertCell(0).appendChild(getATag(json_list[index].link, 
+            json_list[index].title));
+        row.insertCell(1).innerHTML = json_list[index].score;
+        row.insertCell(2).innerHTML = json_list[index].answer_count;
     }
 }
 
-/* Once the DOM is ready... */
 window.addEventListener('DOMContentLoaded', function () {
-    /* ...query for the active tab... */
     chrome.tabs.query({
         active: true,
         currentWindow: true
     }, function (tabs) {
-        /* ...and send a request to get all the links... */
         chrome.tabs.sendMessage(
             tabs[0].id,
-            {from: 'popup', subject: 'links'},
-            setStackExchangeInfo);
+            {from: 'popup', query: 'json_list'},
+            setStackOverflowInfo);
     });
 });
