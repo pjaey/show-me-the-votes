@@ -1,20 +1,24 @@
- /* let the page load completely */
+/* let the page load completely */
 setTimeout(execute, 1000);
 
 function execute() {
+    if (!api_info || !api_info.pattern || !api_info.matching_index || !api_info.api_link) {
+        process_results([]);
+        return;
+    }
     /* Get all links */
     var hrefs = [], all_links = document.links;
     for (var i = 0; i < all_links.length; i++) {
         hrefs.push(all_links[i].href);
     }
     /* extract pattern from the links */
-    var pattern = ('^https{0,1}://stackoverflow\.com/questions/([0-9]*?)/'),
+    var pattern = (api_info.pattern),
         patterns = [],
         found = false;
     for (var i = 0; i < hrefs.length; i++) {
         var match = hrefs[i].match(pattern);
         if (match !== null && match.length >= 2) {
-            patterns.push(match[1]);
+            patterns.push(match[api_info.matching_index]);
         }
     }
     /* retain only unique entries */
@@ -28,9 +32,7 @@ function execute() {
         var query_param, chunk = 100;
         for (var i = 0, j = unique_patterns.length; i < j; i += chunk) {
             query_param = unique_patterns.slice(i, i + chunk).join(';');
-            jQuery.getJSON('https://api.stackexchange.com/2.2/questions/' + 
-                query_param +
-                '?order=desc&sort=votes&site=stackoverflow',
+            jQuery.getJSON(String.format(api_info.api_link, query_param),
                 function (json) {
                     if (json.hasOwnProperty('items')) {
                         process_results(json['items']);
@@ -39,7 +41,7 @@ function execute() {
                     }
                 }
             );
-        }  
+        }
     } else {
         process_results([]);
     }
@@ -48,9 +50,9 @@ function execute() {
 /* talk with background and popup */
 function process_results(json_list) {
     /* render number of links on the batch/icon */
-    chrome.runtime.sendMessage({        
-        from: 'content',       
-        value: json_list.length      
+    chrome.runtime.sendMessage({
+        from: 'content',
+        value: json_list.length
     });
 
     /* Listen for message from the popup */
@@ -59,4 +61,17 @@ function process_results(json_list) {
             response(json_list);
         }
     });
-} 
+}
+
+/* String format function found at http://stackoverflow.com/questions/610406/ */
+if (!String.format) {
+    String.format = function (format) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        return format.replace(/{(\d+)}/g, function (match, number) {
+            return typeof args[number] != 'undefined'
+                    ? args[number]
+                    : match
+                    ;
+        });
+    };
+}
