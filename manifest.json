@@ -5,10 +5,6 @@
   "description": "This extension displays total number of comments and votes for the links present on the website ",
   "version": "1.0",
 
-  "background": {
-    "persistent": false,
-    "scripts": ["background.js"]
-  },
 // TODO: matches should only contain search engine websites
   "content_scripts": [
     {
