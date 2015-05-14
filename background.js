@@ -27,7 +27,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender) {
             chrome.notifications.create('votes_' + tabId, opt, function() {
                 setTimeout(function() {
                     chrome.notifications.clear('votes_' + tabId);
-                }, 1000);
+                }, 1500);
             });
         }
     }
