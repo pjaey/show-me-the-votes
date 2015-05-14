@@ -1,3 +1,7 @@
+/*
+popup.js: contains functions to dynamically render results passed on by content.js
+*/
+
 /* Private function to get a standard table to display links info */
 function getTable(headers) {
     var table = document.createElement('table');

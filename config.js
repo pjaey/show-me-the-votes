@@ -1,3 +1,6 @@
+/* 
+config.js- config file for the extension 
+*/
 api_info = {
   pattern: '^https{0,1}://(www){0,1}stackoverflow\.com/questions/([0-9]*?)/',
   matching_index: 2,

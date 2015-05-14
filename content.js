@@ -1,6 +1,14 @@
-/* let the page load completely */
+/* 
+content.js: contains the functions that must be executed everytime a page is loaded. 
+*/
+
+/* let the page load completely and then run execute() */
 setTimeout(execute, 1000);
 
+/* 
+First gets all the links available on the page and then applies regex to all the links.
+Then make an api call to get back the data which is used by popup.   
+*/
 function execute() {
     if (!api_info || !api_info.pattern || !api_info.matching_index || !api_info.api_link) {
         process_results([]);
@@ -49,7 +57,7 @@ function execute() {
 
 /* talk with background and popup */
 function process_results(json_list) {
-    /* render number of links on the batch/icon */
+    /* render number of links on the batch/icon by sending a message to background */
     chrome.runtime.sendMessage({
         from: 'content',
         value: json_list.length
