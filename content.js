@@ -3,7 +3,7 @@ content.js: contains the functions that must be executed everytime a page is loa
 */
 
 /* let the page load completely and then run execute() */
-setTimeout(execute, 1000);
+setTimeout(execute, 1500);
 
 /* 
 First gets all the links available on the page and then applies regex to all the links.
