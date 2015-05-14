@@ -3,7 +3,7 @@ content.js: contains the functions that must be executed everytime a page is loa
 */
 
 /* let the page load completely and then run execute() */
-setTimeout(execute, 1500);
+setTimeout(execute, 1250);
 
 /* 
 First gets all the links available on the page and then applies regex to all the links.
@@ -60,7 +60,7 @@ function process_results(json_list) {
     /* render number of links on the batch/icon by sending a message to background */
     chrome.runtime.sendMessage({
         from: 'content',
-        value: json_list.length
+        total_links: json_list.length
     });
 
     /* Listen for message from the popup */
@@ -76,10 +76,7 @@ if (!String.format) {
     String.format = function (format) {
         var args = Array.prototype.slice.call(arguments, 1);
         return format.replace(/{(\d+)}/g, function (match, number) {
-            return typeof args[number] != 'undefined'
-                    ? args[number]
-                    : match
-                    ;
+            return typeof args[number] != 'undefined' ? args[number]: match;
         });
     };
 }
